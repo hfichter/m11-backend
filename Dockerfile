@@ -1,6 +1,8 @@
 FROM alpine:latest
 
 ARG PB_VERSION=0.21.1
+# Nginx waits for PB to initialize and accept connections at startup
+ENV PB_INIT_WAIT=0.2
 
 RUN apk add --no-cache \
     unzip \
@@ -24,4 +26,4 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80
 
 # start Nginx and PocketBase
-CMD nginx && /pb/pocketbase serve --http=0.0.0.0:8080
+CMD (sleep $PB_INIT_WAIT && nginx)& /pb/pocketbase serve --http=0.0.0.0:8080
